@@ -1,0 +1,29 @@
+.project-details-container {
+    position: relative;
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.go-home-btn {
+    position: absolute;
+    left: 15px;
+    top: 5px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.go-home-btn:hover {
+    background-color: #45a049;
+}
+
+.project-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}

@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Загальні стилі */
+a {
+  color: #000000;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out, text-shadow 0.3s ease-in-out;
+}
+
+a:hover {
+  color: #acdab5;
+  text-shadow: 0px 0px 8px rgba(20, 68, 44, 0.73);
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f4f7fb;
+  margin: 0;
+  padding: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 5px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+input[type="text"], select {
+  padding: 10px 20px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  transition: border 0.3s ease;
+}
+
+input[type="text"]:focus, select:focus {
+  border: 1px solid #4CAF50;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1, h2, h3 {
+  font-family: 'Arial', sans-serif;
+  color: #222;
+}
+
+ul {
+  padding: 0;
+  margin: 20px 0;
+  list-style: none;
+}
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .task-item {
+    margin-bottom: 10px;
+  }
+}
+@keyframes slide-in {
+  from {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.task-item {
+  animation: slide-in 0.3s ease-out;
+}
+
