@@ -182,12 +182,13 @@ app.post('/tasks', (req, res) => {
 
 app.put('/tasks/:id', (req, res) => {
     const { id } = req.params;
-    const { status } = req.body;
+    const { name, status } = req.body;
     const userId = req.session.userId;
 
     if (!userId) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
+
     db.query('SELECT role FROM users WHERE id = ?', [userId], (err, results) => {
         if (err) {
             console.error("Error querying user role:", err);
@@ -196,51 +197,51 @@ app.put('/tasks/:id', (req, res) => {
 
         const userRole = results[0]?.role;
 
-        db.query('SELECT status FROM tasks WHERE id = ?', [id], (err, results) => {
+        db.query('SELECT * FROM tasks WHERE id = ?', [id], (err, results) => {
             if (err) {
-                console.error("Error querying task status:", err);
+                console.error("Error querying task:", err);
                 return res.status(500).json({ error: err.message });
             }
 
-            const currentStatus = results[0]?.status;
-
-            if (currentStatus === status) {
-                return res.status(200).json({ message: 'Status is already up to date' }); // Статус не змінився
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'Task not found' });
             }
 
-            if (userRole === 'admin') {
-                db.query('UPDATE tasks SET status = ? WHERE id = ?', [status, id], (err) => {
+            if (userRole === 'admin' || userRole === 'teamlead') {
+                const updateFields = [];
+                const values = [];
+
+                if (name) {
+                    updateFields.push('name = ?');
+                    values.push(name);
+                }
+
+                if (status) {
+                    updateFields.push('status = ?');
+                    values.push(status);
+                }
+
+                if (updateFields.length === 0) {
+                    return res.status(400).json({ message: 'No fields to update' });
+                }
+
+                values.push(id);
+
+                db.query(`UPDATE tasks SET ${updateFields.join(', ')} WHERE id = ?`, values, (err) => {
                     if (err) {
-                        console.error("Error updating task status:", err);
+                        console.error("Error updating task:", err);
                         return res.status(500).json({ error: err.message });
                     }
-                    console.log(`Task status updated by admin: Task ID = ${id}, New Status = ${status}`);
-                    return res.status(200).json({ message: 'Task status updated successfully' });
+                    console.log(`Task updated: Task ID = ${id}, Name = ${name || 'No change'}, Status = ${status || 'No change'}`);
+                    res.status(200).json({ message: 'Task updated successfully' });
                 });
             } else {
-                db.query('SELECT * FROM project_users WHERE user_id = ? AND project_id = (SELECT project_id FROM tasks WHERE id = ?)', [userId, id], (err, results) => {
-                    if (err) {
-                        console.error("Error querying project access:", err);
-                        return res.status(500).json({ error: err.message });
-                    }
-                    if (results.length === 0) {
-                        console.warn(`User ${userId} does not have access to task ${id}`);
-                        return res.status(403).json({ message: 'Forbidden' });
-                    }
-
-                    db.query('UPDATE tasks SET status = ? WHERE id = ?', [status, id], (err) => {
-                        if (err) {
-                            console.error("Error updating task status:", err);
-                            return res.status(500).json({ error: err.message });
-                        }
-                        console.log(`Task status updated: Task ID = ${id}, New Status = ${status}`);
-                        res.status(200).json({ message: 'Task status updated successfully' });
-                    });
-                });
+                res.status(403).json({ message: 'Forbidden' });
             }
         });
     });
 });
+
 
 
 app.delete('/tasks/:id', (req, res) => {
